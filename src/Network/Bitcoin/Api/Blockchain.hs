@@ -11,6 +11,7 @@ import qualified Data.Bitcoin.Types                       as BT
 import qualified Network.Bitcoin.Api.Internal             as I
 import qualified Network.Bitcoin.Api.Types                as T
 import qualified Network.Bitcoin.Api.Types.BlockChainInfo as BCI
+import qualified Network.Bitcoin.Api.Types.ChainTips      as CT
 import qualified Network.Bitcoin.Api.Types.TxInfo         as TXI
 import qualified Network.Bitcoin.Api.Types.HeaderInfo     as HDI
 import qualified Data.Base58String                        as B58S
@@ -57,6 +58,12 @@ getBlockHeader client hash =
   let configuration = [toJSON hash, toJSON False]
 
   in I.callMaybe client "getblockheader" configuration
+
+-- | Gets information about the highest-height block (tip) of each local block chain
+getChainTips :: T.Client -> IO CT.ChainTips
+getChainTips client =
+  I.call client "getchaintips" emptyArray
+
 
 -- | Gets information about a block header based its hash.
 getBlockHeaderInfo
