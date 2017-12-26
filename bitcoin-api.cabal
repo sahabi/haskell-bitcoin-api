@@ -39,6 +39,7 @@ library
       Network.Bitcoin.Api.Client
       Network.Bitcoin.Api.Types
       Network.Bitcoin.Api.Types.BlockChainInfo
+      Network.Bitcoin.Api.Types.ChainTips
       Network.Bitcoin.Api.Types.UnspentTransaction
       Network.Bitcoin.Api.Types.TxInfo
       Network.Bitcoin.Api.Types.UnspentTxOut
@@ -73,7 +74,7 @@ library
     , bitcoin-block
     , http-types
 
-test-suite test-suite
+Test-Suite test-suite
   type: exitcode-stdio-1.0
   ghc-options: -Wall -ferror-spans -threaded -auto-all -caf-all -fno-warn-type-defaults
   default-language: Haskell2010
@@ -82,13 +83,13 @@ test-suite test-suite
   main-is: Main.hs
   other-modules:
       Network.Bitcoin.Api.BlockchainSpec
-      Network.Bitcoin.Api.ClientSpec
-      Network.Bitcoin.Api.DumpSpec
-      Network.Bitcoin.Api.MiningSpec
-      Network.Bitcoin.Api.MiscSpec
+      --Network.Bitcoin.Api.ClientSpec
+      --Network.Bitcoin.Api.DumpSpec
+      --Network.Bitcoin.Api.MiningSpec
+      --Network.Bitcoin.Api.MiscSpec
       Network.Bitcoin.Api.TestUtil
-      Network.Bitcoin.Api.TransactionSpec
-      Network.Bitcoin.Api.WalletSpec
+      --Network.Bitcoin.Api.TransactionSpec
+      --Network.Bitcoin.Api.WalletSpec
       Spec
   build-depends:
       base >=4.3 && <5
@@ -101,4 +102,5 @@ test-suite test-suite
     , bitcoin-script
     , http-client
     , hspec
+    , hexstring
     , bitcoin-api
