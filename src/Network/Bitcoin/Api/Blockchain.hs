@@ -3,16 +3,36 @@
 module Network.Bitcoin.Api.Blockchain where
 
 import           Data.Aeson
-import           Data.Aeson.Types                   (emptyArray)
+import           Data.Aeson.Types                         (emptyArray)
 
-import qualified Data.HexString                         as HS
-import qualified Data.Bitcoin.Block                     as Btc
-import qualified Data.Bitcoin.Types                     as BT
-import qualified Network.Bitcoin.Api.Internal           as I
-import qualified Network.Bitcoin.Api.Types              as T
-import qualified Network.Bitcoin.Api.Types.TxInfo       as TXI
-import qualified Network.Bitcoin.Api.Types.HeaderInfo   as HDI
-import qualified Data.Base58String                      as B58S
+import qualified Data.HexString                           as HS
+import qualified Data.Bitcoin.Block                       as Btc
+import qualified Data.Bitcoin.Types                       as BT
+import qualified Network.Bitcoin.Api.Internal             as I
+import qualified Network.Bitcoin.Api.Types                as T
+import qualified Network.Bitcoin.Api.Types.BlockChainInfo as BCI
+import qualified Network.Bitcoin.Api.Types.TxInfo         as TXI
+import qualified Network.Bitcoin.Api.Types.HeaderInfo     as HDI
+import qualified Data.Base58String                        as B58S
+
+-- | Gets the header hash of the most recent block on the best block chain.
+getBestBlockHash :: T.Client -> IO BT.BlockHash
+getBestBlockHash client =
+  I.call client "getbestblockhash" emptyArray
+
+-- | Gets a block based on its hash.
+getBlock :: T.Client     -- ^ Our session context
+         -> HS.HexString -- ^ Hexadecimal representation of the hash of a block
+         -> IO (Maybe Btc.Block) -- ^ The block
+getBlock client hash =
+  let configuration = [toJSON hash, toJSON False]
+
+  in fmap Btc.decode <$> I.callMaybe client "getblock" configuration
+
+-- | Gets info about the current state of the block chain
+getBlockChainInfo :: T.Client -> IO BCI.BlockChainInfo
+getBlockChainInfo client =
+  I.call client "getblockchaininfo" emptyArray
 
 -- | Gets the amount of blocks currently in the blockchain, also known as the
 --   'height' of the blockchain.
@@ -28,15 +48,6 @@ getBlockHash client offset =
   let configuration = [toJSON offset]
 
   in I.call client "getblockhash"  configuration
-
--- | Gets a block based on its hash.
-getBlock :: T.Client     -- ^ Our session context
-         -> HS.HexString -- ^ Hexadecimal representation of the hash of a block
-         -> IO (Maybe Btc.Block) -- ^ The block
-getBlock client hash =
-  let configuration = [toJSON hash, toJSON False]
-
-  in fmap Btc.decode <$> I.callMaybe client "getblock" configuration
 
 -- | Gets a block header based on its hash.
 getBlockHeader :: T.Client          -- ^ Our session context
