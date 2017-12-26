@@ -89,10 +89,6 @@ call client method params =
                 command
         case rE of
           Right r -> return (r ^. W.responseBody)
-          Left ex@(StatusCodeException _ hdrL _) ->
-            throwNothing (hdrM >>= decode . BL.fromStrict)
-                where hdrM = lookup "X-Response-Body-Start" hdrL
-                      throwNothing = maybe (E.throwM (ex :: HttpException)) return
           Left ex -> E.throwM (ex :: HttpException)
 
   in do
