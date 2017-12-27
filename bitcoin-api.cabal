@@ -104,3 +104,5 @@ Test-Suite test-suite
     , hspec
     , hexstring
     , bitcoin-api
+    , bitcoin-block
+    , base16-bytestring
