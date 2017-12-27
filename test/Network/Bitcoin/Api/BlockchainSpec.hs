@@ -6,6 +6,7 @@ import qualified Network.Bitcoin.Api.Blockchain     as BC
 import           Network.Bitcoin.Api.TestUtil (testClient)
 import           Network.Bitcoin.Api.Types.BlockChainInfo
 import           Network.Bitcoin.Api.Types.ChainTips as CT
+import           Network.Bitcoin.Api.Types.HeaderInfo  as HDI
 import           Test.Hspec
 import           Data.Bitcoin.Block  (blockHeader, merkleRoot)
 import           Data.HexString
@@ -69,6 +70,18 @@ spec = do
           Nothing -> error "we got nothing"
 
 
-      it "can request info: hgiest-height block of each local block chain" $ do
+      it "can request info: highest-height block of each local block chain" $ do
         r <- testClient BC.getChainTips
-        (height $ P.head r) `shouldSatisfy` (> 500000)
+        (CT.height $ P.head r) `shouldSatisfy` (> 500000)
+
+
+      it "can request info about a block header from block hash" $ do
+        h <- testClient $ \client -> do
+          (BC.getBlockHash client) 0
+        r <- testClient $ \client -> do
+          (BC.getBlockHeaderInfo client) h
+        case r of
+          Just x -> (HDI.height x) `shouldSatisfy` (== 0)
+          Nothing -> error "RPC error"
+
+
