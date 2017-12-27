@@ -8,9 +8,9 @@ import           Test.Hspec
 import           Data.Bitcoin.Block  (blockHeader, merkleRoot)
 import           Data.HexString
 import           Data.Text                   as T
-import           Data.ByteString.Base16
+--import           Data.ByteString.Base16
 import           Data.ByteString.Char8 as BS
-
+import           Data.LargeWord
 spec :: Spec
 spec = do
   describe "when testing blockchain functions" $ do
@@ -24,21 +24,8 @@ spec = do
           Blockchain.getBlock client $ hexString $ BS.pack "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048"
         o <- case r of
                Just x -> return (x^.blockHeader.merkleRoot)
-        o `shouldSatisfy` (== 68808657956240486906676849581291559270304947746101859651009505967123642662414)
-
-      it "can request multiple blocks successfully" $ do
-        testClient $ \client -> do
-          hs <- mapM (Blockchain.getBlockHash client) [0..10]
-          bs <- mapM (Blockchain.getBlock client) hs
-          fromIntegral (Prelude.length (bs)) `shouldBe` 11
-
-      it "can request blockcount" $ do
-        r <- testClient Blockchain.getBlockCount
-        r `shouldSatisfy` (>= 100)
-
-      it "can request info: the current state of the chain (main)" $ do
-        r <- testClient Blockchain.getBlockChainInfo
-        (T.unpack $ chain r) `shouldSatisfy` (== "main")
+               Nothing -> return(0)
+        o `shouldSatisfy` (== (68808657956240486906676849581291559270304947746101859651009505967123642662414 :: Word256))
 
       it "can request a block based on its hash (main)" $ do
         h <- testClient $ \client -> do
@@ -48,6 +35,25 @@ spec = do
         Prelude.putStrLn $ show r
         o <- case r of
                Just x -> return (x^.blockHeader.merkleRoot)
-        o `shouldSatisfy` (== 26976096685621018606398710717950663031556786548057122896278395450162841280074)
+               Nothing -> return(0)
+        o `shouldSatisfy` (== (26976096685621018606398710717950663031556786548057122896278395450162841280074 :: Word256))
 
+      it "can request multiple blocks successfully" $ do
+        testClient $ \client -> do
+          hs <- mapM (Blockchain.getBlockHash client) [0..10]
+          bs <- mapM (Blockchain.getBlock client) hs
+          fromIntegral (Prelude.length (bs)) `shouldBe` 11
+
+      it "can request info: the current state of the chain (main)" $ do
+        r <- testClient Blockchain.getBlockChainInfo
+        (T.unpack $ chain r) `shouldSatisfy` (== "main")
+
+      it "can request blockcount" $ do
+        r <- testClient Blockchain.getBlockCount
+        r `shouldSatisfy` (>= 100)
+
+      it "can request the block hash from height" $ do
+        r <- testClient $ \client -> do
+          (Blockchain.getBlockHash client) 1
+        r `shouldSatisfy`  (== (hexString $ BS.pack "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048"))
 

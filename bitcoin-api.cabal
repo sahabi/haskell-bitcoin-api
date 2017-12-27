@@ -106,3 +106,4 @@ Test-Suite test-suite
     , bitcoin-api
     , bitcoin-block
     , base16-bytestring
+    , largeword
